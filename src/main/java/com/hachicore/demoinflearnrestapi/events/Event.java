@@ -1,5 +1,6 @@
 package com.hachicore.demoinflearnrestapi.events;
 
+import com.hachicore.demoinflearnrestapi.accounts.Account;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,6 +27,9 @@ public class Event {
     private boolean free;
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
+
+    @ManyToOne
+    private Account manager;
 
     public void update() {
         // update free
