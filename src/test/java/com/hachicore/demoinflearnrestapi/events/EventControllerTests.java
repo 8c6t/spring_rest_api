@@ -4,6 +4,7 @@ import com.hachicore.demoinflearnrestapi.accounts.Account;
 import com.hachicore.demoinflearnrestapi.accounts.AccountRepository;
 import com.hachicore.demoinflearnrestapi.accounts.AccountRole;
 import com.hachicore.demoinflearnrestapi.accounts.AccountService;
+import com.hachicore.demoinflearnrestapi.common.AppProperties;
 import com.hachicore.demoinflearnrestapi.common.BaseControllerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +40,9 @@ public class EventControllerTests extends BaseControllerTest {
 
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    AppProperties appProperties;
 
     @BeforeEach
     public void setUp() {
@@ -351,22 +355,17 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     private String getAccessToken() throws Exception {
-        String username = "rokuthread@gmail.com";
-        String password = "password";
         Account account = Account.builder()
-                .email(username)
-                .password(password)
+                .email(appProperties.getUserUsername())
+                .password(appProperties.getUserPassword())
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
         accountService.saveAccount(account);
 
-        String clientId = "myApp";
-        String clientSecret = "pass";
-
         ResultActions perform = mockMvc.perform(post("/oauth/token")
-                .with(httpBasic(clientId, clientSecret))
-                .param("username", username)
-                .param("password", password)
+                .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
+                .param("username", appProperties.getUserUsername())
+                .param("password", appProperties.getUserPassword())
                 .param("grant_type", "password"));
 
         String responseBody = perform.andReturn().getResponse().getContentAsString();
